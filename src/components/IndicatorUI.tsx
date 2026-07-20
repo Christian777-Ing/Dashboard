@@ -1,30 +1,39 @@
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
+import { Box, Typography, CircularProgress } from '@mui/material';
 
 interface IndicatorUIProps {
   title: string;
-  value: string;
-  caption?: string;
-  color?: string;
+  value?: string;
+  loading?: boolean;
 }
 
-export default function IndicatorUI({ title, value, caption, color }: IndicatorUIProps) {
+export default function IndicatorUI({ title, value, loading = false }: IndicatorUIProps) {
   return (
-    <Card sx={{ minHeight: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#fff' }}>
-      <CardContent>
-        <Typography variant="h4" component="div" sx={{ color: color ?? '#111', fontWeight: 700, mb: 1 }}>
-          {value}
+    <Box
+      sx={{
+        p: 3,
+        bgcolor: '#ffffff',
+        borderRadius: 3,
+        boxShadow: '0 16px 30px rgba(12, 25, 55, 0.08)',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mb: 1 }}>
+        {title}
+      </Typography>
+
+      {loading ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', py: 0.5 }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : (
+        <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
+          {value ?? '--'}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: caption ? 0.5 : 0 }}>
-          {title}
-        </Typography>
-        {caption && (
-          <Typography variant="caption" color="text.secondary">
-            {caption}
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
+      )}
+    </Box>
   );
 }

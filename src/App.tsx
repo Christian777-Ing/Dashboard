@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import { Grid, CircularProgress, Box } from '@mui/material';
+import { Grid, Box } from '@mui/material';
 import HeaderUI from './components/HeaderUI';
 import AlertUI from './components/AlertUI';
 import SelectorUI from './components/SelectorUI';
@@ -15,7 +15,7 @@ function App() {
   const [selectedMetricId, setSelectedMetricId] = useState<MetricId>('all');
 
   const currentCity = CITIES.find((c) => c.id === selectedCityId) ?? CITIES[0];
-  const { data, loading, error } = useFetchData(currentCity.latitude, currentCity.longitude);
+  const { data, loading, error } = useFetchData(selectedCityId);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -26,11 +26,15 @@ function App() {
           <HeaderUI subtitle={`Monitoreo en tiempo real para ${currentCity.label}`} />
         </Grid>
 
-        {/* Alertas */}
+        {/* Estado API */}
         <Grid size={{ xs: 12, md: 12 }}>
           <AlertUI
             title="Estado de conexión API"
-            description={error ? `Error: ${error}` : `Datos sincronizados exitosamente con Open-Meteo para ${currentCity.label}.`}
+            description={
+              error
+                ? `Error: ${error}`
+                : `Datos sincronizados exitosamente con Open-Meteo para ${currentCity.label}.`
+            }
             severity={error ? 'error' : 'success'}
           />
         </Grid>
@@ -48,43 +52,39 @@ function App() {
           />
         </Grid>
 
-        {/* Indicadores */}
+        {/* Indicadores en tarjetas que persisten en la pantalla */}
         <Grid container size={{ xs: 12, md: 9 }} spacing={2}>
-          {loading ? (
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : data ? (
-            <>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <IndicatorUI
-                  title="Temperatura (2m)"
-                  value={`${data.current.temperature_2m} ${data.current_units.temperature_2m}`}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <IndicatorUI
-                  title="Sensación Térmica"
-                  value={`${data.current.apparent_temperature} ${data.current_units.apparent_temperature}`}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <IndicatorUI
-                  title="Velocidad del Viento"
-                  value={`${data.current.wind_speed_10m} ${data.current_units.wind_speed_10m}`}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <IndicatorUI
-                  title="Humedad Relativa"
-                  value={`${data.current.relative_humidity_2m} ${data.current_units.relative_humidity_2m}`}
-                />
-              </Grid>
-            </>
-          ) : null}
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <IndicatorUI
+              title="Temperatura (2m)"
+              value={data ? `${data.current.temperature_2m} ${data.current_units.temperature_2m}` : undefined}
+              loading={loading}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <IndicatorUI
+              title="Sensación Térmica"
+              value={data ? `${data.current.apparent_temperature} ${data.current_units.apparent_temperature}` : undefined}
+              loading={loading}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <IndicatorUI
+              title="Velocidad del Viento"
+              value={data ? `${data.current.wind_speed_10m} ${data.current_units.wind_speed_10m}` : undefined}
+              loading={loading}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <IndicatorUI
+              title="Humedad Relativa"
+              value={data ? `${data.current.relative_humidity_2m} ${data.current_units.relative_humidity_2m}` : undefined}
+              loading={loading}
+            />
+          </Grid>
         </Grid>
 
-        {/* Gráfico */}
+        {/* Gráfico fija en el contenedor */}
         <Grid size={{ xs: 12, md: 12 }}>
           <ChartUI
             data={data}
@@ -94,7 +94,7 @@ function App() {
           />
         </Grid>
 
-        {/* La tabla la puedes dejar abajo con ancho completo o según prefieras */}
+        {/* Tabla */}
         <Grid size={{ xs: 12, md: 12 }}>
           <TableUI
             data={data}
@@ -103,6 +103,7 @@ function App() {
             selectedMetricId={selectedMetricId}
           />
         </Grid>
+
       </Grid>
     </Box>
   );
