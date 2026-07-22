@@ -9,14 +9,14 @@ interface AlertConfig {
 
 export default function AlertUI({ title, description, severity = 'info' }: AlertConfig) {
   return (
-    <Alert variant="standard" severity={severity} sx={{ alignItems: 'flex-start', p: 2 }}>
+    <Alert variant="standard" severity={severity} sx={{ alignItems: 'flex-start', p: 2, textAlign: 'left' }}>
       <div>
         {title && (
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5, textAlign: 'left' }}>
             {title}
           </Typography>
         )}
-        <Typography variant="body2" sx={{ color: 'inherit' }}>
+        <Typography variant="body2" sx={{ color: 'inherit', textAlign: 'left' }}>
           {description}
         </Typography>
       </div>
