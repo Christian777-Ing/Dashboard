@@ -101,6 +101,17 @@ export default function ChartUI({
 
   const leftMargin = activeYAxes.length > 1 ? 100 : 50;
 
+  const formatXAxisLabel = (date: Date) => {
+    const day = date.getUTCDate();
+    const month = date.toLocaleDateString('es-ES', { month: 'short', timeZone: 'UTC' });
+    const hour = date.getUTCHours();
+    const period = hour === 0 ? '12AM' : hour === 12 ? '12PM' : hour < 12 ? `${hour}AM` : `${hour - 12}PM`;
+
+    return `${day} ${month} ${period}`;
+  };
+
+  const xAxisTickValues = timeDates.filter((_, index) => index === 0 || index % 12 === 0);
+
   return (
     <Box
       sx={{
@@ -173,12 +184,8 @@ export default function ChartUI({
               {
                 scaleType: 'utc',
                 data: timeDates,
-                tickInterval: (time: Date) => new Date(time).getUTCHours() === 0,
-                valueFormatter: (date: Date) => {
-                  const day = date.getUTCDate();
-                  const month = date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' });
-                  return `${day} ${month}`;
-                },
+                tickValues: xAxisTickValues,
+                valueFormatter: (date: Date) => formatXAxisLabel(date),
               },
             ]}
             series={activeSeries.map(({ id, ...seriesProps }) => seriesProps)}
