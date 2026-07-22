@@ -110,8 +110,6 @@ export default function ChartUI({
     return `${day} ${month} ${period}`;
   };
 
-  const xAxisTickValues = timeDates.filter((_, index) => index === 0 || index % 12 === 0);
-
   return (
     <Box
       sx={{
@@ -184,7 +182,7 @@ export default function ChartUI({
               {
                 scaleType: 'utc',
                 data: timeDates,
-                tickValues: xAxisTickValues,
+                tickInterval: (_value: Date, index: number) => index === 0 || index % 12 === 0,
                 valueFormatter: (date: Date) => formatXAxisLabel(date),
               },
             ]}
