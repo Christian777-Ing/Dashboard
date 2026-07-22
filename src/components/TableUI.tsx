@@ -15,19 +15,34 @@ interface TableUIProps {
 export default function TableUI({ data, loading, error, selectedMetricId }: TableUIProps) {
   // Procesamiento seguro de datos
   const rows = data?.hourly
-    ? data.hourly.time.map((time, index) => ({
-        id: index + 1,
-        time: time.substring(11, 16),
-        temperature: data.hourly.temperature_2m?.[index] ?? null,
-        wind: data.hourly.wind_speed_10m?.[index] ?? null,
-        humidity: data.hourly.relative_humidity_2m?.[index] ?? null,
-        apparent: data.hourly.apparent_temperature?.[index] ?? null,
-      }))
+    ? data.hourly.time.map((time, index) => {
+        const date = new Date(time);
+        const day = date.toLocaleDateString('es-ES', {
+          day: '2-digit',
+          month: 'short',
+          timeZone: 'UTC',
+        });
+        const hour = date.toLocaleTimeString('es-ES', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+          timeZone: 'UTC',
+        });
+
+        return {
+          id: index + 1,
+          time: `${day} ${hour}`,
+          temperature: data.hourly.temperature_2m?.[index] ?? null,
+          wind: data.hourly.wind_speed_10m?.[index] ?? null,
+          humidity: data.hourly.relative_humidity_2m?.[index] ?? null,
+          apparent: data.hourly.apparent_temperature?.[index] ?? null,
+        };
+      })
     : [];
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'time', headerName: 'Hora', width: 100 },
+    { field: 'time', headerName: 'Día y Hora', width: 140 },
     {
       field: 'temperature',
       headerName: 'Temperatura (°C)',
