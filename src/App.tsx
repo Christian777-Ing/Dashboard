@@ -17,6 +17,14 @@ function App() {
   const currentCity = CITIES.find((c) => c.id === selectedCityId) ?? CITIES[0];
   const { data, loading, error } = useFetchData(selectedCityId);
 
+  const alertDescription = loading
+    ? `Cargando datos para ${currentCity.label}...`
+    : error
+      ? `Error: ${error}`
+      : `Datos sincronizados exitosamente con Open-Meteo para ${currentCity.label}.`;
+
+  const alertSeverity = loading ? 'info' : error ? 'error' : 'success';
+
   return (
     <Box sx={{ p: 3 }}>
       <Grid container spacing={3} sx={{ justifyContent: 'left', alignItems: 'center' }}>
@@ -30,12 +38,8 @@ function App() {
         <Grid size={{ xs: 12, md: 12 }}>
           <AlertUI
             title="Estado de conexión API"
-            description={
-              error
-                ? `Error: ${error}`
-                : `Datos sincronizados exitosamente con Open-Meteo para ${currentCity.label}.`
-            }
-            severity={error ? 'error' : 'success'}
+            description={alertDescription}
+            severity={alertSeverity}
           />
         </Grid>
 

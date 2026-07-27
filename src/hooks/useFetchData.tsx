@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import type { OpenMeteoResponse } from '../types/DashboardTypes';
 
+export interface UseFetchDataResult {
+  data: OpenMeteoResponse | undefined;
+  loading: boolean;
+  error: string | undefined;
+}
+
 // Diccionario que soporta IDs en minúscula, mayúscula y nombres de la Guía 17
 const CITY_COORDS: Record<string, { latitude: number; longitude: number }> = {
   // Minúsculas (IDs comunes)
@@ -15,26 +21,27 @@ const CITY_COORDS: Record<string, { latitude: number; longitude: number }> = {
   Manta: { latitude: -0.9677, longitude: -80.7089 },
 };
 
-export default function useFetchData(selectedOption: string | null) {
+export default function useFetchData(selectedOption: string | null): UseFetchDataResult {
   const [data, setData] = useState<OpenMeteoResponse | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    let isMounted = true;
+    const controller = new AbortController();
 
     const fetchData = async () => {
+      setData(undefined);
       setLoading(true);
       setError(undefined);
 
       try {
-        // Normalización para encontrar la ciudad sin importar si viene en minúsculas o mayúsculas
-        const key = selectedOption ? selectedOption.trim() : 'Guayaquil';
-        const cityConfig = CITY_COORDS[key] || CITY_COORDS['Guayaquil'];
+        const normalizedOption = selectedOption?.trim() ?? 'Guayaquil';
+        const normalizedKey = normalizedOption.charAt(0).toUpperCase() + normalizedOption.slice(1).toLowerCase();
+        const cityConfig = CITY_COORDS[normalizedKey] || CITY_COORDS[normalizedOption] || CITY_COORDS['Guayaquil'];
 
         const URL = `https://api.open-meteo.com/v1/forecast?latitude=${cityConfig.latitude}&longitude=${cityConfig.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,apparent_temperature&timezone=auto`;
 
-        const response = await fetch(URL);
+        const response = await fetch(URL, { signal: controller.signal });
 
         if (!response.ok) {
           throw new Error(`Error HTTP (${response.status}): ${response.statusText}`);
@@ -42,11 +49,11 @@ export default function useFetchData(selectedOption: string | null) {
 
         const result: OpenMeteoResponse = await response.json();
 
-        if (isMounted) {
+        if (!controller.signal.aborted) {
           setData(result);
         }
       } catch (err) {
-        if (isMounted) {
+        if (!controller.signal.aborted) {
           setError(
             err instanceof Error
               ? err.message
@@ -54,8 +61,8 @@ export default function useFetchData(selectedOption: string | null) {
           );
         }
       } finally {
-        if (isMounted) {
-          setLoading(false); // Garantiza que la rueda de carga SIEMPRE se apague
+        if (!controller.signal.aborted) {
+          setLoading(false);
         }
       }
     };
@@ -63,7 +70,7 @@ export default function useFetchData(selectedOption: string | null) {
     fetchData();
 
     return () => {
-      isMounted = false;
+      controller.abort();
     };
   }, [selectedOption]);
 
