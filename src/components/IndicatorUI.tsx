@@ -4,9 +4,10 @@ interface IndicatorUIProps {
   title: string;
   value?: string;
   loading?: boolean;
+  error?: string;
 }
 
-export default function IndicatorUI({ title, value, loading = false }: IndicatorUIProps) {
+export default function IndicatorUI({ title, value, loading = false, error }: IndicatorUIProps) {
   return (
     <Box
       sx={{
@@ -31,7 +32,7 @@ export default function IndicatorUI({ title, value, loading = false }: Indicator
         </Box>
       ) : (
         <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a' }}>
-          {value ?? '--'}
+          {error ? error : value ?? '--'}
         </Typography>
       )}
     </Box>

@@ -10,12 +10,22 @@ import TableUI from './components/TableUI';
 import ChartUI from './components/ChartUI';
 import { CITIES, METRICS, type MetricId } from './types/DashboardTypes';
 
+type IndicatorMetric = 'temperature_2m' | 'apparent_temperature' | 'wind_speed_10m' | 'relative_humidity_2m';
+
 function App() {
   const [selectedCityId, setSelectedCityId] = useState<string>(CITIES[0].id);
   const [selectedMetricId, setSelectedMetricId] = useState<MetricId>('all');
 
   const currentCity = CITIES.find((c) => c.id === selectedCityId) ?? CITIES[0];
   const { data, loading, error } = useFetchData(selectedCityId);
+
+  const getIndicatorValue = (metric: IndicatorMetric) => {
+    if (!data) {
+      return error ? 'Sin datos disponibles' : undefined;
+    }
+
+    return `${data.current[metric]} ${data.current_units[metric]}`;
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -57,29 +67,33 @@ function App() {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorUI
               title="Temperatura (2m)"
-              value={data ? `${data.current.temperature_2m} ${data.current_units.temperature_2m}` : undefined}
+              value={getIndicatorValue('temperature_2m')}
               loading={loading}
+              error={error}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorUI
               title="Sensación Térmica"
-              value={data ? `${data.current.apparent_temperature} ${data.current_units.apparent_temperature}` : undefined}
+              value={getIndicatorValue('apparent_temperature')}
               loading={loading}
+              error={error}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorUI
               title="Velocidad del Viento"
-              value={data ? `${data.current.wind_speed_10m} ${data.current_units.wind_speed_10m}` : undefined}
+              value={getIndicatorValue('wind_speed_10m')}
               loading={loading}
+              error={error}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <IndicatorUI
               title="Humedad Relativa"
-              value={data ? `${data.current.relative_humidity_2m} ${data.current_units.relative_humidity_2m}` : undefined}
+              value={getIndicatorValue('relative_humidity_2m')}
               loading={loading}
+              error={error}
             />
           </Grid>
         </Grid>
