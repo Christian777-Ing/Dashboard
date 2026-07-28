@@ -7,7 +7,7 @@ export interface UseFetchDataResult {
   error: string | undefined;
 }
 
-// Diccionario que soporta IDs en minúscula, mayúscula y nombres de la Guía 17
+// Diccionario que soporta IDs en minúscula, mayúscula y nombres
 const CITY_COORDS: Record<string, { latitude: number; longitude: number }> = {
   // Minúsculas (IDs comunes)
   guayaquil: { latitude: -2.1962, longitude: -79.8862 },

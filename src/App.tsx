@@ -88,7 +88,7 @@ function App() {
           </Grid>
         </Grid>
 
-        {/* Gráfico fija en el contenedor */}
+        {/* Gráfico en el contenedor */}
         <Grid size={{ xs: 12, md: 12 }}>
           <ChartUI
             data={data}
