@@ -20,8 +20,16 @@ function App() {
   const { data, loading, error } = useFetchData(selectedCityId);
 
   const getIndicatorValue = (metric: IndicatorMetric) => {
+    if (loading) {
+      return 'Cargando...';
+    }
+
+    if (error) {
+      return error;
+    }
+
     if (!data) {
-      return error ? 'Sin datos disponibles' : undefined;
+      return 'Sin datos disponibles';
     }
 
     return `${data.current[metric]} ${data.current_units[metric]}`;
@@ -41,11 +49,13 @@ function App() {
           <AlertUI
             title="Estado de conexión API"
             description={
-              error
-                ? `Error: ${error}`
-                : `Datos sincronizados exitosamente con Open-Meteo para ${currentCity.label}.`
+              loading
+                ? 'Consultando el servicio de clima...'
+                : error
+                  ? `Error: ${error}`
+                  : `Datos sincronizados exitosamente con Open-Meteo para ${currentCity.label}.`
             }
-            severity={error ? 'error' : 'success'}
+            severity={error ? 'error' : loading ? 'info' : 'success'}
           />
         </Grid>
 

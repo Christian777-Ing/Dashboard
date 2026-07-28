@@ -43,7 +43,7 @@ function getCityCoordinates(selectedOption: string | null): CityCoordinates {
 
 export default function useFetchData(selectedOption: string | null): UseFetchDataResult {
   const [data, setData] = useState<OpenMeteoResponse | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -71,6 +71,7 @@ export default function useFetchData(selectedOption: string | null): UseFetchDat
         }
       } catch (err) {
         if (isMounted) {
+          setData(undefined);
           setError(
             err instanceof Error
               ? err.message
